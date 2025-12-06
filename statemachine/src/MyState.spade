@@ -6,34 +6,44 @@ enum State {
 }
 
 entity MyState(clk : clock, rst : bool) -> bool {
+
+
     reg(clk) state reset(rst : State::Idle) = 
         match(state) {
             State::Idle => {
                 State::state_a$(duration : 5)
             },
-            State::state_a$(duration) => {
-                State::state_a$(duration : trunc(duration - 1))
-            },
             State::state_a$(duration : 0) => {
                 State::state_b$(duration : 10)
             },
-            State::state_b$(duration) => {
-                State::state_b$(duration : trunc(duration - 1))
+            State::state_a$(duration) => {
+                State::state_a$(duration : trunc(duration - 1))
             },
             State::state_b$(duration : 0) => {
                 State::state_c$(duration : 15)
             },
-            State::state_c$(duration) => {
-                State::state_c$(duration : trunc(duration - 1))
+            State::state_b$(duration) => {
+                State::state_b$(duration : trunc(duration - 1))
             },
             State::state_c$(duration : 0) => {
                 State::Idle
             },
+            State::state_c$(duration) => {
+                State::state_c$(duration : trunc(duration - 1))
+            },
+
         };
 
-    match(state) {
-        State::state_a(_) => true,
-        _ => false
-    }
+    
+    let ret = match(state) {
+        State::state_a$(duration : 3) => {
+            true
+        },
+        _ => {
+            false
+        }
+    };
+
+    true
     
 }
