@@ -1,0 +1,12 @@
+use lib::MyPwm::MyPwm;
+use lib::MyState::MyState;
+
+entity MyAction(clk : clock, rst : bool) -> bool {
+
+    let duration_cycles = 100;
+    let value = inst MyState::<uint<10>>(clk, rst);
+
+    let pwm = inst MyPwm::<uint<10>>(clk, rst, duration_cycles, value);
+
+    true
+}

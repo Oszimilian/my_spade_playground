@@ -1,49 +1,89 @@
-enum State {
+enum State<T> {
     Idle,
-    state_a{duration : uint<4>},
-    state_b{duration : uint<4>},
-    state_c{duration : uint<4>}
+    state_a{duration : T},
+    state_b{duration : T},
+    state_c{duration : T}
 }
 
-entity MyState(clk : clock, rst : bool) -> bool {
+fn all_ones<#uint T>() -> uint<T> {
+    ~0
+}
 
+entity MyState<T>(clk : clock, rst : bool) -> T {
+    
 
-    reg(clk) state reset(rst : State::Idle) = 
+    
+    reg(clk) cnt : uint<5> reset(rst : 0) = 
+
+        if cnt < all_ones::<5>() {
+            trunc(cnt + 1)
+        } 
+        else {
+            0
+        };
+
+    let up = if cnt == 0 {
+        true
+    } else {
+        false
+    };
+        
+
+    reg(clk) state : State<T> reset(rst : State::Idle) = 
         match(state) {
             State::Idle => {
-                State::state_a$(duration : 5)
+                State::state_a$(duration : 30)
             },
             State::state_a$(duration : 0) => {
-                State::state_b$(duration : 10)
+                State::state_b$(duration : 40)
             },
             State::state_a$(duration) => {
-                State::state_a$(duration : trunc(duration - 1))
+                if up {
+                    State::state_a$(duration : trunc(duration - 1))
+                } else {
+                    state
+                }
+                
             },
             State::state_b$(duration : 0) => {
-                State::state_c$(duration : 15)
+                State::state_c$(duration : 50)
             },
             State::state_b$(duration) => {
-                State::state_b$(duration : trunc(duration - 1))
+                if up {
+                    State::state_b$(duration : trunc(duration - 1))
+                } else {
+                    state
+                }
             },
             State::state_c$(duration : 0) => {
                 State::Idle
             },
             State::state_c$(duration) => {
-                State::state_c$(duration : trunc(duration - 1))
+                if up {
+                    State::state_c$(duration : trunc(duration - 1))
+                } else {
+                    state
+                }
             },
 
         };
 
     
     let ret = match(state) {
-        State::state_a$(duration : 3) => {
-            true
+        State::state_a(duration) => {
+            duration
+        },
+        State::state_b(duration) => {
+            duration
+        },
+        State::state_c(duration) => {
+            duration
         },
         _ => {
-            false
+            0
         }
     };
 
-    true
+    ret
     
 }

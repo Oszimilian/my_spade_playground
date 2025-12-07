@@ -1,0 +1,20 @@
+
+
+entity MyPwm<T>(clk : clock, rst : bool, duration_cycles : T, value : T) -> bool {
+    reg(clk) cnt : T reset(rst : 0) = {
+        if cnt == duration_cycles {
+            0
+        } else {
+            trunc(cnt + 1)
+        }
+    };
+
+    let duty : bool =  
+    if cnt < value {
+        false
+    } else {
+        true
+    };
+
+    duty
+}
